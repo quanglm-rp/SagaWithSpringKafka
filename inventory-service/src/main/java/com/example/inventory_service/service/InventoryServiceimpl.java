@@ -15,6 +15,7 @@ import java.util.UUID;
 @Service
 public class InventoryServiceimpl implements IInventoryService {
 
+    private boolean success = false;
     @Autowired
     private InventoryRepository _inventoryRepository;
 
@@ -69,7 +70,7 @@ public class InventoryServiceimpl implements IInventoryService {
 
     @Override
     public Boolean deductInventory(int product_id, int quantity) {
-        boolean success = true;
+
         try {
             _inventoryRepository.findByProductId(product_id).map(InventoryMapping::dtoToEntity)
                     .flatMap(savedInventory -> _inventoryRepository.findById(savedInventory.getId()).doOnNext(u -> {
@@ -79,7 +80,9 @@ public class InventoryServiceimpl implements IInventoryService {
                         }
                     }).flatMap(_inventoryRepository::save))
                     .subscribe(resultValue -> System.out.println("Inventory updated: " + resultValue),
-                            error -> System.err.println("Error: " + error));
+                            error -> System.err.println("Error: " + error),       // onError
+                            () -> success = false
+                    );
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
             success = false;
@@ -89,7 +92,6 @@ public class InventoryServiceimpl implements IInventoryService {
 
     @Override
     public Boolean revertInventory(int product_id, int quantity) {
-        boolean success = true;
         try {
             _inventoryRepository.findByProductId(product_id).map(InventoryMapping::dtoToEntity)
                     .flatMap(savedInventory -> _inventoryRepository.findById(savedInventory.getId()).doOnNext(u -> {
@@ -97,7 +99,8 @@ public class InventoryServiceimpl implements IInventoryService {
                         u.setAmount(u.getAmount() + quantity);
                     }).flatMap(_inventoryRepository::save))
                     .subscribe(resultValue -> System.out.println("Inventory updated: " + resultValue),
-                            error -> System.err.println("Error: " + error));
+                            error -> System.err.println("Error: " + error),       // onError
+                            () -> success = false);
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
             success = false;

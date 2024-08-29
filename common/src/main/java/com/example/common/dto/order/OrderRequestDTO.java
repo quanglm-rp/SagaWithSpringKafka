@@ -16,7 +16,7 @@ public class OrderRequestDTO {
     private State status;
     private Integer quantity;
     private UUID id;
-
+    private Integer totalPrice;
     public Integer getQuantity() {
         return quantity;
     }
@@ -27,6 +27,14 @@ public class OrderRequestDTO {
 
     public UUID getId() {
         return id;
+    }
+
+    public Integer getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Integer totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     public void setId(UUID id) {

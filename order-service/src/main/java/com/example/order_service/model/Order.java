@@ -19,4 +19,5 @@ public class Order {
     private Integer productId;
     private State status;
     private Integer quantity;
+    private Integer totalPrice;
 }

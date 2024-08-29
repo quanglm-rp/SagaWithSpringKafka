@@ -50,6 +50,7 @@ public class OrderServiceImpl implements IOrderService {
                     orderSend.setUserId(o.getUserId());
                     orderSend.setStatus(o.getStatus());
                     orderSend.setQuantity(o.getQuantity());
+                    orderSend.setTotalPrice(o.getTotalPrice());
                     _springCloudStreamPubliser.send(orderSend);
                     return Mono.just(o);
                 });;

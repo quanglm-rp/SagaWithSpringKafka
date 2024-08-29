@@ -32,9 +32,12 @@ public class SpringCloudStreamConsumer {
 
                 if(isExist != null)
                 {
-                    _inventoryService.deductInventory(OrderRequestDTO.getProductId(), OrderRequestDTO.getQuantity());
-                    OrderRequestDTO.setStatus(State.IN_STOCK);
-                    streamBridge.send("order-out-0", OrderRequestDTO);
+                    boolean inStock = _inventoryService.deductInventory(OrderRequestDTO.getProductId(), OrderRequestDTO.getQuantity());
+                    if(inStock)
+                    {
+                        OrderRequestDTO.setStatus(State.IN_STOCK);
+                        streamBridge.send("order-out-0", OrderRequestDTO);
+                    }
                 }
                 else {
                     OrderRequestDTO.setStatus(State.OUT_OF_STOCK);
@@ -43,10 +46,13 @@ public class SpringCloudStreamConsumer {
             }
             if(OrderRequestDTO.getStatus() == State.ORDER_CANCELED)
             {
-                _inventoryService.revertInventory(OrderRequestDTO.getProductId(), OrderRequestDTO.getQuantity());
-                streamBridge.send("order-out-0", OrderRequestDTO) ;
+                boolean isRevert = _inventoryService.revertInventory(OrderRequestDTO.getProductId(), OrderRequestDTO.getQuantity());
+                if(isRevert)
+                {
+                    OrderRequestDTO.setStatus(State.ORDER_CANCELED);
+                    streamBridge.send("order-out-0", OrderRequestDTO) ;
+                }
             }
         };
-
     }
 }

@@ -14,4 +14,6 @@ public class OrderResponseDTO {
     private Integer productId;
     private State status;
     private UUID id;
+    private Integer quantity;
+    private Integer totalPrice;
 }
