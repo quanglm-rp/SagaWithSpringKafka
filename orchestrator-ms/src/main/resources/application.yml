@@ -1,0 +1,17 @@
+server:
+  port: 9292
+spring:
+  cloud:
+    function:
+      definition: orderBinding
+    stream:
+      bindings:
+        orderBinding-in-0: #CHANEL
+          destination: order-out-0
+          group: order
+      kafka:
+        binder:
+          brokers: localhost:9092
+          default:
+            consumer:
+              auto-offset-reset: earliest

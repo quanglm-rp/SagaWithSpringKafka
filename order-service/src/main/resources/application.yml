@@ -1,0 +1,23 @@
+server:
+  port: 9191
+
+spring.jpa:
+  database: POSTGRESQL
+  hibernate.ddl-auto: create-drop
+  show-sql: true
+
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/orderservicedb?currentSchema=order_service
+    username: postgres
+    password: postgres
+  cloud:
+    stream:
+      kafka:
+        binder:
+        brokers: localhost:9092
+        replicationFactor: 1
+
+
+
+

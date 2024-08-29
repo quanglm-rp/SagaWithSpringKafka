@@ -1,0 +1,21 @@
+server:
+  port: 9293
+spring:
+  cloud:
+    function:
+      definition: inventoryBinding
+    stream:
+      bindings:
+        inventoryBinding-in-0: #CHANEL
+          destination: order-check-inventory-topic
+          group: order
+      kafka:
+        binder:
+          brokers: localhost:9092
+#          default:
+#            consumer:
+#              auto-offset-reset: earliest
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/orderservicedb?currentSchema=inventory_service
+    username: postgres
+    password: postgres
