@@ -3,11 +3,14 @@ server:
 spring:
   cloud:
     function:
-      definition: inventoryBinding
+      definition: checkInventoryBinding, revertInventoryBinding
     stream:
       bindings:
-        inventoryBinding-in-0: #CHANEL
+        checkInventoryBinding-in-0: #CHANEL
           destination: order-check-inventory-topic
+          group: order
+        revertInventoryBinding-in-0: #CHANEL
+          destination: order-revert-inventory-topic
           group: order
       kafka:
         binder:

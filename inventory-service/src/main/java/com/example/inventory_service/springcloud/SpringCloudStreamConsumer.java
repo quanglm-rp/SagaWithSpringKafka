@@ -22,37 +22,28 @@ public class SpringCloudStreamConsumer {
     private IInventoryService _inventoryService;
 
     @Bean
-    public Consumer<OrderRequestDTO> inventoryBinding() {
+    public Consumer<OrderRequestDTO> checkInventoryBinding() {
         return OrderRequestDTO -> {
             System.out.println(OrderRequestDTO.toString());
-
-            if(OrderRequestDTO.getStatus() == State.ORDER_CREATED)
+            Mono<InventoryResponeDTO> isExist = _inventoryService.checkInventoryExist(OrderRequestDTO.getProductId());
+            if(isExist != null)
             {
-                Mono<InventoryResponeDTO> isExist = _inventoryService.checkInventoryExist(OrderRequestDTO.getProductId());
-
-                if(isExist != null)
+                boolean inStock = _inventoryService.deductInventory(OrderRequestDTO.getProductId(), OrderRequestDTO.getQuantity());
+                if(inStock)
                 {
-                    boolean inStock = _inventoryService.deductInventory(OrderRequestDTO.getProductId(), OrderRequestDTO.getQuantity());
-                    if(inStock)
-                    {
-                        OrderRequestDTO.setStatus(State.IN_STOCK);
-                        streamBridge.send("order-out-0", OrderRequestDTO);
-                    }
-                }
-                else {
-                    OrderRequestDTO.setStatus(State.OUT_OF_STOCK);
-                    streamBridge.send("order-out-0", OrderRequestDTO) ;
+                    OrderRequestDTO.setStatus(State.IN_STOCK);
+                    streamBridge.send("order-out-0", OrderRequestDTO);
                 }
             }
-            if(OrderRequestDTO.getStatus() == State.ORDER_CANCELED)
-            {
-                boolean isRevert = _inventoryService.revertInventory(OrderRequestDTO.getProductId(), OrderRequestDTO.getQuantity());
-                if(isRevert)
-                {
-                    OrderRequestDTO.setStatus(State.ORDER_CANCELED);
-                    streamBridge.send("order-out-0", OrderRequestDTO) ;
-                }
-            }
+        };
+    }
+
+    @Bean
+    public Consumer<OrderRequestDTO> revertInventoryBinding() {
+        return OrderRequestDTO -> {
+            System.out.println(OrderRequestDTO.toString());
+            OrderRequestDTO.setStatus(State.OUT_OF_STOCK);
+            streamBridge.send("order-out-0", OrderRequestDTO) ;
         };
     }
 }

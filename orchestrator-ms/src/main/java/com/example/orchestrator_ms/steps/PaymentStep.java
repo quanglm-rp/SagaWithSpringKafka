@@ -1,29 +1,25 @@
 package com.example.orchestrator_ms.steps;
 
-import com.example.orchestrator_ms.common.InventoryRequestDTO;
-import com.example.orchestrator_ms.common.PaymentRequestDTO;
-import com.example.orchestrator_ms.service.WorkflowStep;
-import com.example.orchestrator_ms.service.WorkflowStepStatus;
+import com.example.common.dto.order.OrderRequestDTO;
+import com.example.common.state.State;
+import com.example.orchestrator_ms.interfaceservice.Step;
+import org.springframework.cloud.stream.function.StreamBridge;
 
-public class PaymentStep implements WorkflowStep {
-    private final PaymentRequestDTO requestDTO;
-    private WorkflowStepStatus stepStatus = WorkflowStepStatus.PENDING;
+public class PaymentStep implements Step {
 
-    public PaymentStep(PaymentRequestDTO requestDTO) {
-        this.requestDTO = requestDTO;
-    }
-    @Override
-    public WorkflowStepStatus getStatus() {
-        return stepStatus;
+    private StreamBridge streamBridge;
+
+    public PaymentStep(StreamBridge streamBridge) {
+        this.streamBridge = streamBridge;
     }
 
     @Override
-    public void process() {
-
-    }
-
-    @Override
-    public void revert() {
-
+    public void excute(OrderRequestDTO orderRequestDTO) {
+        if(orderRequestDTO.getStatus() == State.IN_STOCK) {
+            streamBridge.send("order-check-payment-topic", orderRequestDTO);
+        }
+        if (orderRequestDTO.getStatus() == State.OUT_OF_STOCK) {
+            streamBridge.send("order-revert-payment-topic", orderRequestDTO);
+        }
     }
 }

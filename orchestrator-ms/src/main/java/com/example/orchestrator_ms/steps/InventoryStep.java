@@ -1,30 +1,25 @@
 package com.example.orchestrator_ms.steps;
 
-import com.example.orchestrator_ms.common.InventoryRequestDTO;
-import com.example.orchestrator_ms.service.WorkflowStep;
-import com.example.orchestrator_ms.service.WorkflowStepStatus;
+import com.example.common.dto.order.OrderRequestDTO;
+import com.example.common.state.State;
+import com.example.orchestrator_ms.interfaceservice.Step;
+import org.springframework.cloud.stream.function.StreamBridge;
 
-public class InventoryStep implements WorkflowStep {
+public class InventoryStep implements Step {
 
-    private final InventoryRequestDTO requestDTO;
-    private WorkflowStepStatus stepStatus = WorkflowStepStatus.PENDING;
+    private StreamBridge streamBridge;
 
-    public InventoryStep(InventoryRequestDTO requestDTO) {
-        this.requestDTO = requestDTO;
+    public InventoryStep(StreamBridge streamBridge) {
+        this.streamBridge = streamBridge;
     }
 
     @Override
-    public WorkflowStepStatus getStatus() {
-        return stepStatus;
-    }
-
-    @Override
-    public void process() {
-
-    }
-
-    @Override
-    public void revert() {
-
+    public void excute(OrderRequestDTO orderRequestDTO) {
+        if(orderRequestDTO.getStatus() == State.ORDER_CREATED){
+            streamBridge.send("order-check-inventory-topic", orderRequestDTO);
+        }
+        if(orderRequestDTO.getStatus() == State.ORDER_CANCELED){
+            streamBridge.send("order-revert-payment-topic", orderRequestDTO);
+        }
     }
 }
