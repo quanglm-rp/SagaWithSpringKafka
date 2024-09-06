@@ -15,7 +15,7 @@ import java.util.UUID;
 @Service
 public class InventoryServiceimpl implements IInventoryService {
 
-    private boolean success = false;
+    private boolean success = true;
     @Autowired
     private InventoryRepository _inventoryRepository;
 
@@ -72,16 +72,32 @@ public class InventoryServiceimpl implements IInventoryService {
     public Boolean deductInventory(int product_id, int quantity) {
 
         try {
+            Mono<Inventory> a = _inventoryRepository.findByProductId(product_id).map(InventoryMapping::dtoToEntity);
             _inventoryRepository.findByProductId(product_id).map(InventoryMapping::dtoToEntity)
                     .flatMap(savedInventory -> _inventoryRepository.findById(savedInventory.getId()).doOnNext(u -> {
                         if (u.getAmount() > quantity + 1) {
+                            System.out.println("Success");
                             u.setId(savedInventory.getId());
                             u.setAmount(u.getAmount() - quantity);
                         }
+                        else
+                        {
+                            System.out.println("Fail");
+                            success = false;
+                        }
                     }).flatMap(_inventoryRepository::save))
-                    .subscribe(resultValue -> System.out.println("Inventory updated: " + resultValue),
-                            error -> System.err.println("Error: " + error),       // onError
-                            () -> success = false
+                    .subscribe(resultValue -> {
+                                if (resultValue.getAmount() > quantity + 1) {
+                                    System.out.println("Success");
+                                    success = true;
+                                }
+                                else
+                                {
+                                    System.out.println("Fail");
+                                    success = false;
+                                }
+                            },
+                            error -> System.err.println("Error: " + error)
                     );
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
@@ -99,8 +115,8 @@ public class InventoryServiceimpl implements IInventoryService {
                         u.setAmount(u.getAmount() + quantity);
                     }).flatMap(_inventoryRepository::save))
                     .subscribe(resultValue -> System.out.println("Inventory updated: " + resultValue),
-                            error -> System.err.println("Error: " + error),       // onError
-                            () -> success = false);
+                            error -> System.err.println("Error: " + error)
+                    );
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
             success = false;

@@ -16,5 +16,4 @@ public class OrchestratorMsApplication {
 		workflowStep.initSteps();
 		SpringApplication.run(OrchestratorMsApplication.class, args);
 	}
-
 }

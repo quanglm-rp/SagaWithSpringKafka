@@ -31,7 +31,13 @@ public class SpringCloudStreamConsumer {
                 boolean inStock = _inventoryService.deductInventory(OrderRequestDTO.getProductId(), OrderRequestDTO.getQuantity());
                 if(inStock)
                 {
+                    System.out.println("Success");
                     OrderRequestDTO.setStatus(State.IN_STOCK);
+                    streamBridge.send("order-out-0", OrderRequestDTO);
+                }
+                else{
+                    System.out.println("Success");
+                    OrderRequestDTO.setStatus(State.OUT_OF_STOCK);
                     streamBridge.send("order-out-0", OrderRequestDTO);
                 }
             }

@@ -3,7 +3,7 @@ server:
 spring:
   cloud:
     function:
-      definition: checkInventoryBinding, revertInventoryBinding
+      definition: checkInventoryBinding; revertInventoryBinding
     stream:
       bindings:
         checkInventoryBinding-in-0: #CHANEL

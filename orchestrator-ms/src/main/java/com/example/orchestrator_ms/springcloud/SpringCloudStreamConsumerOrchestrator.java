@@ -23,7 +23,7 @@ public class SpringCloudStreamConsumerOrchestrator {
             System.out.println(orderRequestDTO);
 
             Step step = WorkflowStep.steps.get(orderRequestDTO.getStatus());
-            step.excute(orderRequestDTO);
+            step.process(orderRequestDTO, streamBridge);
 
 //            //send inventory success
 //            if(OrderRequestDTO.getStatus() == State.ORDER_CREATED)

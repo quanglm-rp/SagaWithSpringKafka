@@ -12,5 +12,5 @@ import java.util.UUID;
 public class InventoryResponeDTO {
     private UUID id;
     private Integer productId;
-    private Integer quantity;
+    private Integer amount;
 }

@@ -10,21 +10,12 @@ import java.util.HashMap;
 
 public class WorkflowStep {
     public static HashMap<State, Step> steps = new HashMap<State, Step>();
-    private StreamBridge streamBridge;
-
-    public WorkflowStep() {
-
-    }
-
-    public WorkflowStep(StreamBridge streamBridge) {
-        this.streamBridge = streamBridge;
-    }
 
     public HashMap<State, Step> initSteps() {
-        steps.put(State.ORDER_CREATED, new InventoryStep(streamBridge));
-        steps.put(State.ORDER_CANCELED, new InventoryStep(streamBridge));
-        steps.put(State.IN_STOCK, new PaymentStep(streamBridge));
-        steps.put(State.OUT_OF_STOCK, new PaymentStep(streamBridge));
+        steps.put(State.ORDER_CREATED, new InventoryStep());
+        steps.put(State.ORDER_CANCELED, new InventoryStep());
+        steps.put(State.IN_STOCK, new PaymentStep());
+        steps.put(State.OUT_OF_STOCK, new PaymentStep());
         return steps;
     }
 }

@@ -7,14 +7,8 @@ import org.springframework.cloud.stream.function.StreamBridge;
 
 public class PaymentStep implements Step {
 
-    private StreamBridge streamBridge;
-
-    public PaymentStep(StreamBridge streamBridge) {
-        this.streamBridge = streamBridge;
-    }
-
     @Override
-    public void excute(OrderRequestDTO orderRequestDTO) {
+    public void process(OrderRequestDTO orderRequestDTO, StreamBridge streamBridge) {
         if(orderRequestDTO.getStatus() == State.IN_STOCK) {
             streamBridge.send("order-check-payment-topic", orderRequestDTO);
         }

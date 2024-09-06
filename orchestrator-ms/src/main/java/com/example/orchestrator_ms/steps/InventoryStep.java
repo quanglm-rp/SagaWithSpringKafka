@@ -7,19 +7,14 @@ import org.springframework.cloud.stream.function.StreamBridge;
 
 public class InventoryStep implements Step {
 
-    private StreamBridge streamBridge;
-
-    public InventoryStep(StreamBridge streamBridge) {
-        this.streamBridge = streamBridge;
-    }
 
     @Override
-    public void excute(OrderRequestDTO orderRequestDTO) {
+    public void process(OrderRequestDTO orderRequestDTO, StreamBridge streamBridge) {
         if(orderRequestDTO.getStatus() == State.ORDER_CREATED){
             streamBridge.send("order-check-inventory-topic", orderRequestDTO);
         }
         if(orderRequestDTO.getStatus() == State.ORDER_CANCELED){
-            streamBridge.send("order-revert-payment-topic", orderRequestDTO);
+            streamBridge.send("order-revert-inventory-topic", orderRequestDTO);
         }
     }
 }
